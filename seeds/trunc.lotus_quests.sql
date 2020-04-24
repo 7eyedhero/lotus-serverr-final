@@ -1,0 +1,3 @@
+TRUNCATE
+ lotus_quests
+  RESTART IDENTITY CASCADE;

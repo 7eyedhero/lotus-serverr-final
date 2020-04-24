@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS lotus_quests CASCADE;

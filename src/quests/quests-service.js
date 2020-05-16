@@ -16,15 +16,18 @@ const QuestsService = {
         'qust.quest_target_attack',
         'qust.quest_target_defense',
         'qust.mission_type'
-      );
+      )
+      .leftJoin('lotus_results AS rslt', 'qust.id', 'rslt.quest_id')
+      .leftJoin('triiibe_members AS usr', 'rslt.member_id', 'usr.id')
+      .groupBy('qust.id', 'usr.id');
   },
   getById(db, id) {
     return QuestsService.getQuests(db).where('qust.id', id).first();
   },
 
-  //   insertCharacter(db, newCharacter) {
-  //     return db.insert(newCharacter).into('triiibe_characters').returning('*').then(([ character ]) => character);
-  //   },
+  insertResults(db, results) {
+    return db.insert(results).into('lotus_results').returning('*').then(([ results ]) => results);
+  },
   serializeQuests(quests) {
     return quests.map(this.serializeQuest);
   },
@@ -42,7 +45,9 @@ const QuestsService = {
       exp_value: qustData.exp_value,
       target_atk: qustData.quest_target_attack,
       target_def: qustData.quest_target_defense,
-      mission_type: qustData.mission_type
+      mission_type: qustData.mission_type,
+      result: qustData.quest_result,
+      member_id: qustData.member_id
     };
   }
 };

@@ -21,6 +21,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/members', membersRouter);
 app.use('/api/characters', charactersRouter);
 app.use('/api/quests', questsRouter);
+app.use('/api/results', questsRouter);
 
 // request handling
 app.get('/', (req, res) => {

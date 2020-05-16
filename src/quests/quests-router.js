@@ -14,7 +14,7 @@ questsRouter.route('/').get((req, res, next) => {
     .catch(next);
 });
 
-questsRouter.route('/:questId').all(checkQuestExists).get((req, res) => {
+questsRouter.route('/:questId').all(requireAuth).all(checkQuestExists).get((req, res) => {
   res.json(QuestsService.serializeQuest(res.quest));
 });
 
@@ -33,34 +33,29 @@ async function checkQuestExists(req, res, next) {
   }
 }
 
-// charactersRouter.route('/').post(requireAuth, jsonBodyParser, (req, res, next) => {
-//   const { name, gender, character_class, kingdom } = req.body;
+questsRouter.route('/').post(requireAuth, jsonBodyParser, (req, res, next) => {
+  const { member_id, quest_id, quest_result } = req.body;
 
-//   for (const field of [ 'name', 'gender', 'character_class', 'kingdom' ])
-//     if (!req.body[field])
-//       return res.status(400).json({
-//         error: `Missing '${field}' in request body`
-//       });
+  for (const field of [ 'member_id', 'quest_id', 'quest_result' ])
+    if (!req.body[field])
+      return res.status(400).json({
+        error: `Missing '${field}' in request body`
+      });
 
-//   const member_id = req.user.id;
+  const results = {
+    member_id,
+    quest_id,
+    quest_result
+  };
 
-//   const newCharacter = {
-//     name,
-//     gender,
-//     character_class,
-//     kingdom,
-//     date_created: 'now()',
-//     member_id
-//   };
-
-//   CharactersService.insertCharacter(req.app.get('db'), newCharacter)
-//     .then((character) => {
-//       res
-//         .status(201)
-//         .location(path.posix.join(req.originalUrl, `/${character.id}`))
-//         .json(CharactersService.serializeCharacter(character));
-//     })
-//     .catch(next);
-// });
+  QuestsService.insertResults(req.app.get('db'), results)
+    .then((result) => {
+      res
+        .status(201)
+        .location(path.posix.join(req.originalUrl, `/${result.id}`))
+        .json(QuestsService.serializeQuest(result));
+    })
+    .catch(next);
+});
 
 module.exports = questsRouter;

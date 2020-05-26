@@ -1,7 +1,7 @@
 const Treeize = require('treeize');
 
 const QuestsService = {
-  getQuests(db) {
+  getQuests(db, id) {
     return db
       .from('lotus_quests AS qust')
       .select(
@@ -15,16 +15,15 @@ const QuestsService = {
         'qust.exp_value',
         'qust.quest_target_attack',
         'qust.quest_target_defense',
-        'qust.mission_type'
+        'qust.mission_type',
+        'rslt.quest_result'
       )
       .leftJoin('lotus_results AS rslt', 'qust.id', 'rslt.quest_id')
-      .leftJoin('triiibe_members AS usr', 'rslt.member_id', 'usr.id')
-      .groupBy('qust.id', 'usr.id');
+      .where('rslt.member_id', id);
   },
   getById(db, id) {
     return QuestsService.getQuests(db).where('qust.id', id).first();
   },
-
   insertResults(db, results) {
     return db.insert(results).into('lotus_results').returning('*').then(([ results ]) => results);
   },

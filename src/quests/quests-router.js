@@ -14,6 +14,15 @@ questsRouter.route('/').get((req, res, next) => {
     .catch(next);
 });
 
+questsRouter.route('/own').get(requireAuth, (req, res, next) => {
+  console.log(req.user);
+  QuestsService.getQuests(req.app.get('db'), req.user.id)
+    .then((quests) => {
+      res.json(QuestsService.serializeQuests(quests));
+    })
+    .catch(next);
+});
+
 questsRouter.route('/:questId').all(requireAuth).all(checkQuestExists).get((req, res) => {
   res.json(QuestsService.serializeQuest(res.quest));
 });

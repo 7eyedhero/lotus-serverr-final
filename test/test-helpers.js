@@ -30,11 +30,64 @@ function makeMembersArray() {
   ];
 }
 
+function makeCharactersArray() {
+  return [
+    {
+      id: 1,
+      name: 'test1',
+      gender: 'Male',
+      class: 'Knight',
+      kingdom: 'Ignis',
+      member_id: 1,
+      attack_power: 500,
+      defense_power: 500,
+      intelligence: 500,
+      weapon_equipped: 'test-weapon'
+    },
+    {
+      id: 2,
+      name: 'test2',
+      gender: 'Male',
+      class: 'Paladin',
+      kingdom: 'Oceani',
+      member_id: 2,
+      attack_power: 500,
+      defense_power: 500,
+      intelligence: 500,
+      weapon_equipped: 'test-weapon'
+    },
+    {
+      id: 3,
+      name: 'test3',
+      gender: 'Female',
+      class: 'Knight',
+      kingdom: 'Ventus',
+      member_id: 3,
+      attack_power: 500,
+      defense_power: 500,
+      intelligence: 500,
+      weapon_equipped: 'test-weapon'
+    },
+    {
+      id: 4,
+      name: 'test4',
+      gender: 'Female',
+      class: 'Paladin',
+      kingdom: 'Terra',
+      member_id: 4,
+      attack_power: 500,
+      defense_power: 500,
+      intelligence: 500,
+      weapon_equipped: 'test-weapon'
+    }
+  ];
+}
+
 function makeMembersFixtures() {
   const testMembers = makeMembersArray();
-  //   const testThings = makeThingsArray(testUsers);
+  const testCharacters = makeCharactersArray(testMembers);
   //   const testReviews = makeReviewsArray(testUsers, testThings);
-  return { testMembers };
+  return { testMembers, testCharacters };
 }
 
 function cleanTables(db) {
@@ -64,10 +117,45 @@ function makeAuthHeader(user, secret = process.env.JWT_SECRET) {
   return `Bearer ${token}`;
 }
 
+function seedCharactersTables(db, members, characters) {
+  // use a transaction to group the queries and auto rollback on any failure
+  return db.transaction(async (trx) => {
+    await seedMembers(trx, members);
+    await trx.into('triiibe_characters').insert(characters);
+    await trx.raw(`SELECT setval('triiibe_characters_id_seq', ?)`, [ characters[characters.length - 1].id ]);
+  });
+}
+
+function makeExpectedCharacter(members, character) {
+  const user = members.find((user) => user.id === character.user_id);
+
+  return {
+    id: character.id,
+    name: character.name,
+    gender: character.gender,
+    class: character.class,
+    kingdom: character.kingdom,
+    member_id: character.member_id,
+    attack_power: character.attack_power,
+    defense_power: character.defense_power,
+    intelligence: character.intelligence,
+    weapon_equipped: character.weapon_equipped
+    // user: {
+    //   id: user.id,
+    //   user_name: user.user_name,
+    //   full_name: user.full_name,
+    //   nickname: user.nickname,
+    //   date_created: user.date_created
+    // }
+  };
+}
+
 module.exports = {
   makeMembersArray,
   makeMembersFixtures,
+  seedCharactersTables,
   cleanTables,
   seedMembers,
-  makeAuthHeader
+  makeAuthHeader,
+  makeExpectedCharacter
 };

@@ -7,9 +7,5 @@ describe('App', () => {
     it('responds with 200 containing "Hello, world!"', () => {
       return supertest(app).get('/').expect(200, 'Hello, world!');
     });
-    //ADD SMOKE TESTS TO CLIENT
-    //
-    //
-    //
   });
 });

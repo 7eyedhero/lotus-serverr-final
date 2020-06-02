@@ -14,7 +14,7 @@ questsRouter.route('/').get((req, res, next) => {
     .catch(next);
 });
 
-questsRouter.route('/own').get(requireAuth, (req, res, next) => {
+questsRouter.get('/own', requireAuth, (req, res, next) => {
   console.log(req.user);
   QuestsService.getQuests(req.app.get('db'), req.user.id)
     .then((quests) => {
@@ -24,6 +24,7 @@ questsRouter.route('/own').get(requireAuth, (req, res, next) => {
 });
 
 questsRouter.route('/:questId').all(requireAuth).all(checkQuestExists).get((req, res) => {
+  console.log('21');
   res.json(QuestsService.serializeQuest(res.quest));
 });
 
@@ -46,7 +47,7 @@ questsRouter.route('/').post(requireAuth, jsonBodyParser, (req, res, next) => {
   const { member_id, quest_id, quest_result } = req.body;
 
   for (const field of [ 'member_id', 'quest_id', 'quest_result' ])
-    if (!req.body[field])
+    if (req.body[field] === undefined)
       return res.status(400).json({
         error: `Missing '${field}' in request body`
       });

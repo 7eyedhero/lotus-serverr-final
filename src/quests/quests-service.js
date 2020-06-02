@@ -18,11 +18,17 @@ const QuestsService = {
         'qust.mission_type',
         'rslt.quest_result'
       )
-      .leftJoin('lotus_results AS rslt', 'qust.id', 'rslt.quest_id')
-      .where('rslt.member_id', id);
+      .leftJoin(
+        function() {
+          this.select('*').from('lotus_results').where('member_id', id).as('rslt');
+        },
+        'qust.id',
+        'rslt.quest_id'
+      );
   },
+
   getById(db, id) {
-    return QuestsService.getQuests(db).where('qust.id', id).first();
+    return db.from('lotus_quests').select('*').where('id', id).first();
   },
   insertResults(db, results) {
     return db.insert(results).into('lotus_results').returning('*').then(([ results ]) => results);

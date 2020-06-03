@@ -140,13 +140,6 @@ function makeExpectedCharacter(members, character) {
     defense_power: character.defense_power,
     intelligence: character.intelligence,
     weapon_equipped: character.weapon_equipped
-    // user: {
-    //   id: user.id,
-    //   user_name: user.user_name,
-    //   full_name: user.full_name,
-    //   nickname: user.nickname,
-    //   date_created: user.date_created
-    // }
   };
 }
 
